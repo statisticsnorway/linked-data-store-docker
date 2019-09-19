@@ -21,7 +21,7 @@ services:
     volumes:
     - ldsneo4jdb:/data
     environment:
-    - NEO4J_AUTH: neo4j/PasSW0rd
+    - NEO4J_AUTH=neo4j/PasSW0rd
 
   db-postgres:
     image: postgres:11-alpine
@@ -38,6 +38,17 @@ services:
     ports:
       - 8080:8080
 
+  solr:
+    image: solr
+    ports:
+      - "8983:8983"
+    volumes:
+      - ldssolrdata:/opt/solr/server/solr/mycores
+    entrypoint:
+      - docker-entrypoint.sh
+      - solr-precreate
+      - lds-index
+
 volumes:
   ldspostgresdb:
   ldsneo4jdb:
@@ -53,3 +64,4 @@ volumes:
       type: none
       device: ${PWD}/gsim-raml-schema/jsonschemas
       o: bind
+  ldssolrdata:
