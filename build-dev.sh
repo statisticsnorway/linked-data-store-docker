@@ -1,5 +1,9 @@
 #!/usr/bin/env bash
 
+for i in neo4j:3.5 postgres:11-alpine solr adminer; do
+  docker pull $i &
+done
+
 if [ ! -d "gsim-raml-schema" ]; then
   echo "Cloning GSIM information model...";
   git clone https://github.com/statisticsnorway/gsim-raml-schema.git
@@ -20,5 +24,4 @@ fi
 
 
 mvn clean verify dependency:copy-dependencies &&\
-
 docker build -t lds-server:dev -f Dockerfile-dev .
