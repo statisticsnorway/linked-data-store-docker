@@ -1,4 +1,4 @@
-version: '3.3'
+version: '3.7'
 
 services:
 
@@ -12,6 +12,15 @@ services:
     depends_on:
     - db-neo4j
     - db-postgres
+    - solr
+
+  lds-browser:
+    image: statisticsnorway/lds-browser-dev
+    ports:
+      - "8000:80"
+    depends_on:
+      - lds
+
 
   db-neo4j:
     image: neo4j:3.5
