@@ -52,6 +52,20 @@
         <tag>HEAD</tag>
     </scm>
 
+    <distributionManagement>
+        <repository>
+            <id>github</id>
+            <url>https://maven.pkg.github.com/statisticsnorway/dist</url>
+        </repository>
+    </distributionManagement>
+
+    <repositories>
+        <repository>
+            <id>github</id>
+            <url>https://maven.pkg.github.com/statisticsnorway/dist</url>
+        </repository>
+    </repositories>
+
     <dependencies>
         <dependency>
             <groupId>no.ssb.config</groupId>
@@ -60,13 +74,13 @@
         </dependency>
         <dependency>
             <groupId>no.ssb.lds</groupId>
-            <artifactId>linked-data-store-core</artifactId>
-            <version>0.15-SNAPSHOT</version>
+            <artifactId>lds-core</artifactId>
+            <version>0.15</version>
         </dependency>
         <dependency>
             <groupId>no.ssb.saga</groupId>
-            <artifactId>sagalog-postgres</artifactId>
-            <version>0.1-SNAPSHOT</version>
+            <artifactId>sagalog-postgre</artifactId>
+            <version>0.1</version>
             <scope>runtime</scope>
         </dependency>
         <dependency>
@@ -77,7 +91,7 @@
         <dependency>
             <groupId>no.ssb.rawdata</groupId>
             <artifactId>rawdata-client-provider-postgres</artifactId>
-            <version>0.5-SNAPSHOT</version>
+            <version>0.5</version>
             <scope>runtime</scope>
         </dependency>
         <dependency>
@@ -154,7 +168,9 @@
                 <artifactId>maven-release-plugin</artifactId>
                 <version>2.5.3</version>
                 <configuration>
-                    <goals>install</goals>
+                    <autoVersionSubmodules>false</autoVersionSubmodules>
+                    <useReleaseProfile>false</useReleaseProfile>
+                    <goals>deploy</goals>
                 </configuration>
             </plugin>
         </plugins>
