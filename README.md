@@ -31,4 +31,4 @@ in IDE.
 
 1. Resolve snapshot dependencies in pom.xml to released versions only.
 
-1. Build docker image using the default dockerfile: `docker build -t lds .`
+1. Build docker image using the default dockerfile: `docker build . -t statisticsnorway/lds-server:latest`
