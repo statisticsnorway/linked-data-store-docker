@@ -44,9 +44,10 @@ steps:
     depends_on:
       - test
 
-  - name: publish-docker
+  - name: publish
     image: plugins/gcr
     settings:
+      dockerfile: Dockerfile-dev
       repo: eu.gcr.io/prod-bip/ssb/lds-server
       registry: eu.gcr.io
       auto_tag: true
