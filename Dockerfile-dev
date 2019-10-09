@@ -20,7 +20,7 @@ RUN ["jlink", "--strip-debug", "--no-header-files", "--no-man-pages", "--compres
 #
 # Build LDS image
 #
-FROM alpine:latest
+FROM alpine:latest as base
 
 #
 # Resources from build image
@@ -28,6 +28,42 @@ FROM alpine:latest
 COPY --from=build /linked /jdk/
 COPY target/dependency /lds/lib/
 COPY target/linked-data-store-*.jar /lds/lib/
+
+ENV PATH=/jdk/bin:$PATH
+
+WORKDIR /lds
+
+VOLUME ["/lds/conf", "/lds/schemas"]
+
+EXPOSE 9090
+
+CMD ["java", "-p", "/lds/lib", "-m", "no.ssb.lds.server/no.ssb.lds.server.Server"]
+
+FROM statisticsnorway/raml-to-jsonschema:latest AS gsim-convert
+
+RUN apk update && \
+    apk upgrade && \
+    apk add git
+
+# Fetch the latest schema
+RUN git clone https://github.com/statisticsnorway/gsim-raml-schema /gsim
+
+WORKDIR /gsim
+
+RUN ["java", "-cp", "/opt/raml-to-jsonschema/bin/*", "no.ssb.raml.RamltoJsonSchemaConverter", "/gsim/jsonschemas/", "/gsim/schemas/"]
+
+#
+# Build LDS image
+#
+FROM alpine:latest as gsim
+
+#
+# Resources from build image
+#
+COPY --from=build /linked /jdk/
+COPY target/dependency /lds/lib/
+COPY target/linked-data-store-*.jar /lds/lib/
+COPY --from=gsim-convert /gsim/jsonschemas/ /schemas
 
 ENV PATH=/jdk/bin:$PATH
 

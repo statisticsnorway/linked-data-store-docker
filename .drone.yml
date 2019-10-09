@@ -44,11 +44,29 @@ steps:
     depends_on:
       - test
 
-  - name: publish
+  - name: publish-base
     image: plugins/gcr
     settings:
+      target: base
       dockerfile: Dockerfile-dev
       repo: eu.gcr.io/prod-bip/ssb/lds-server
+      registry: eu.gcr.io
+      auto_tag: true
+      json_key:
+        from_secret: gcr_credentials
+    when:
+      ref:
+        - refs/heads/master
+        - refs/tags/*
+    depends_on:
+      - sonarqube
+
+  - name: publish-gsim
+    image: plugins/gcr
+    settings:
+      target: gsim
+      dockerfile: Dockerfile-dev
+      repo: eu.gcr.io/prod-bip/ssb/lds-server-gsim
       registry: eu.gcr.io
       auto_tag: true
       json_key:
@@ -69,7 +87,8 @@ steps:
     when:
       status: [ success, failure ]
     depends_on:
-      - publish
+      - publish-gsim
+      - publish-base
 
 ---
 kind: secret
