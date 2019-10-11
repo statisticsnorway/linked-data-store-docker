@@ -47,6 +47,7 @@ RUN apk update && \
 
 # Fetch the latest schema
 RUN git clone https://github.com/statisticsnorway/gsim-raml-schema /gsim
+RUN git checkout ${GSIM_VERSION:-HEAD} -C /gsim
 
 WORKDIR /gsim
 

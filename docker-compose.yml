@@ -3,7 +3,7 @@ version: '3.7'
 services:
 
   lds:
-    image: lds-server:dev
+    image: eu.gcr.io/prod-bip/ssb/lds-server-gsim:latest
     ports:
     - "9090:9090"
     volumes:

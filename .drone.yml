@@ -44,7 +44,7 @@ steps:
     depends_on:
       - test
 
-  - name: publish-base
+  - name: publish-server
     image: plugins/gcr
     settings:
       target: base
@@ -61,14 +61,35 @@ steps:
     depends_on:
       - sonarqube
 
-  - name: publish-gsim
+  - name: publish-gsim-latest
     image: plugins/gcr
     settings:
       target: gsim
       dockerfile: Dockerfile-dev
-      repo: eu.gcr.io/prod-bip/ssb/lds-server-gsim
+      repo: eu.gcr.io/prod-bip/ssb/lds-server
       registry: eu.gcr.io
-      auto_tag: true
+      json_key:
+        from_secret: gcr_credentials
+      tags:
+        - ${DRONE_TAG##v}-gsim-latest
+    when:
+      ref:
+        - refs/heads/master
+        - refs/tags/*
+    depends_on:
+      - build
+
+  - name: publish-gsim-v0.6
+    image: plugins/gcr
+    settings:
+      target: gsim
+      dockerfile: Dockerfile-dev
+      repo: eu.gcr.io/prod-bip/ssb/lds-server
+      registry: eu.gcr.io
+      build_args:
+        - GSIM_VERSION=v0.6
+      tags:
+        - ${DRONE_TAG##v}-gsim-0.6
       json_key:
         from_secret: gcr_credentials
     when:
@@ -76,7 +97,27 @@ steps:
         - refs/heads/master
         - refs/tags/*
     depends_on:
-      - sonarqube
+      - build
+
+  - name: publish-gsim-v0.5
+    image: plugins/gcr
+    settings:
+      target: gsim
+      dockerfile: Dockerfile-dev
+      repo: eu.gcr.io/prod-bip/ssb/lds-server-gsim
+      registry: eu.gcr.io
+      build_args:
+        - GSIM_VERSION=v0.5
+      tags:
+        - ${DRONE_TAG=latest##v}-gsim-0.5
+      json_key:
+        from_secret: gcr_credentials
+    when:
+      ref:
+        - refs/heads/master
+        - refs/tags/*
+    depends_on:
+      - build
 
   - name: slack
     image: plugins/slack
@@ -87,8 +128,10 @@ steps:
     when:
       status: [ success, failure ]
     depends_on:
-      - publish-gsim
-      - publish-base
+      - publish-server
+      - publish-gsim-latest
+      - publish-gsim-v0.6
+      - publish-gsim-v0.5
 
 ---
 kind: secret
