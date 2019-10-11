@@ -59,7 +59,7 @@ steps:
         - refs/heads/master
         - refs/tags/*
     depends_on:
-      - sonarqube
+      - test
 
   - name: publish-gsim-latest
     image: plugins/gcr
@@ -77,7 +77,7 @@ steps:
         - refs/heads/master
         - refs/tags/*
     depends_on:
-      - build
+      - test
 
   - name: publish-gsim-v0.6
     image: plugins/gcr
@@ -97,7 +97,7 @@ steps:
         - refs/heads/master
         - refs/tags/*
     depends_on:
-      - build
+      - test
 
   - name: publish-gsim-v0.5
     image: plugins/gcr
@@ -117,7 +117,7 @@ steps:
         - refs/heads/master
         - refs/tags/*
     depends_on:
-      - build
+      - test
 
   - name: slack
     image: plugins/slack
