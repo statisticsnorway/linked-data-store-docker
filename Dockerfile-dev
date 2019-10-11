@@ -41,6 +41,7 @@ CMD ["java", "-p", "/lds/lib", "-m", "no.ssb.lds.server/no.ssb.lds.server.Server
 
 FROM statisticsnorway/raml-to-jsonschema:latest AS gsim-convert
 
+ARG GSIM_VERSION
 RUN apk update && \
     apk upgrade && \
     apk add git
