@@ -71,7 +71,7 @@ steps:
       json_key:
         from_secret: gcr_credentials
       tags:
-        - ${DRONE_TAG##v}-gsim-latest
+        - ${DRONE_BRANCH=latest}${DRONE_TAG##v}-gsim-latest
     when:
       ref:
         - refs/heads/master
@@ -89,7 +89,7 @@ steps:
       build_args:
         - GSIM_VERSION=v0.6
       tags:
-        - ${DRONE_TAG##v}-gsim-0.6
+        - ${DRONE_BRANCH=latest}${DRONE_TAG##v}-gsim-0.6
       json_key:
         from_secret: gcr_credentials
     when:
@@ -109,7 +109,7 @@ steps:
       build_args:
         - GSIM_VERSION=v0.5
       tags:
-        - ${DRONE_TAG=latest##v}-gsim-0.5
+        - ${DRONE_BRANCH=latest}${DRONE_TAG##v}-gsim-0.5
       json_key:
         from_secret: gcr_credentials
     when:
