@@ -130,84 +130,92 @@
         </repository>
     </repositories>
 
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>no.ssb.lds</groupId>
+                <artifactId>linked-data-store-project</artifactId>
+                <version>0.1-SNAPSHOT</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
     <dependencies>
         <dependency>
             <groupId>no.ssb.config</groupId>
             <artifactId>dynamic-configuration</artifactId>
-            <version>0.4</version>
         </dependency>
         <dependency>
             <groupId>no.ssb.lds</groupId>
             <artifactId>linked-data-store-core</artifactId>
-            <version>0.16</version>
+            <exclusions>
+                <exclusion>
+                    <artifactId>jboss-logging</artifactId>
+                    <groupId>org.jboss.logging</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>wildfly-common</artifactId>
+                    <groupId>org.wildfly.common</groupId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>no.ssb.saga</groupId>
             <artifactId>sagalog-postgres</artifactId>
-            <version>0.5</version>
             <scope>runtime</scope>
         </dependency>
         <dependency>
             <groupId>no.ssb.rawdata</groupId>
             <artifactId>rawdata-client-api</artifactId>
-            <version>0.19</version>
         </dependency>
         <dependency>
             <groupId>no.ssb.rawdata</groupId>
             <artifactId>rawdata-client-provider-postgres</artifactId>
-            <version>0.7</version>
             <scope>runtime</scope>
         </dependency>
         <dependency>
             <groupId>no.ssb.lds</groupId>
             <artifactId>linked-data-store-persistence-provider-neo4j</artifactId>
-            <version>0.9</version>
             <scope>runtime</scope>
         </dependency>
         <dependency>
             <groupId>no.ssb.lds</groupId>
             <artifactId>linked-data-store-persistence-provider-postgres</artifactId>
-            <version>0.7</version>
             <scope>runtime</scope>
         </dependency>
         <dependency>
             <groupId>no.ssb.lds</groupId>
             <artifactId>linked-data-store-persistence-provider-memory</artifactId>
-            <version>0.8</version>
             <scope>runtime</scope>
         </dependency>
         <dependency>
             <groupId>no.ssb.lds</groupId>
             <artifactId>linked-data-store-persistence-provider-foundationdb</artifactId>
-            <version>0.8</version>
             <scope>runtime</scope>
         </dependency>
         <dependency>
             <groupId>no.ssb.lds</groupId>
             <artifactId>linked-data-store-search-provider-solr</artifactId>
-            <version>0.3</version>
             <scope>runtime</scope>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
-            <version>${slf4j.version}</version>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>jcl-over-slf4j</artifactId>
-            <version>${slf4j.version}</version>
         </dependency>
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-core</artifactId>
-            <version>${logback.version}</version>
             <scope>runtime</scope>
         </dependency>
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
-            <version>${logback.version}</version>
             <scope>runtime</scope>
             <exclusions>
                 <exclusion>
@@ -224,7 +232,6 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.8.0</version>
                 <configuration>
-                    <source>${java.version}</source>
                     <target>${java.version}</target>
                     <release>${java.version}</release>
                     <encoding>${module.build.sourceEncoding}</encoding>
