@@ -54,11 +54,10 @@
             <repositories>
                 <repository>
                     <id>ssb-bip-releases</id>
-                    <url>https://nexus.prod-bip-ci.ssb.no/repository/maven-releases/</url>
-                </repository>
-                <repository>
-                    <id>ssb-bip-snapshots</id>
-                    <url>https://nexus.prod-bip-ci.ssb.no/repository/maven-snapshots/</url>
+                    <url>https://nexus.prod-bip-ci.ssb.no/repository/maven-public/</url>
+                    <snapshots>
+                        <enabled>true</enabled>
+                    </snapshots>
                 </repository>
             </repositories>
             <distributionManagement>
@@ -115,20 +114,6 @@
         <url>https://github.com/statisticsnorway/linked-data-store-docker/tree/master</url>
         <tag>HEAD</tag>
     </scm>
-
-    <distributionManagement>
-        <repository>
-            <id>github</id>
-            <url>https://maven.pkg.github.com/statisticsnorway/dist</url>
-        </repository>
-    </distributionManagement>
-
-    <repositories>
-        <repository>
-            <id>github</id>
-            <url>https://maven.pkg.github.com/statisticsnorway/dist</url>
-        </repository>
-    </repositories>
 
     <dependencyManagement>
         <dependencies>
