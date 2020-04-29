@@ -135,16 +135,6 @@
         <dependency>
             <groupId>no.ssb.lds</groupId>
             <artifactId>linked-data-store-core</artifactId>
-            <exclusions>
-                <exclusion>
-                    <artifactId>jboss-logging</artifactId>
-                    <groupId>org.jboss.logging</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>wildfly-common</artifactId>
-                    <groupId>org.wildfly.common</groupId>
-                </exclusion>
-            </exclusions>
         </dependency>
         <dependency>
             <groupId>no.ssb.saga</groupId>
