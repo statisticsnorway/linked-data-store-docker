@@ -19,6 +19,7 @@ FROM alpine:latest
 #
 # Resources from build image
 #
+COPY run.sh /lds/run.sh
 COPY --from=build /linked /jdk/
 COPY --from=build /lds/target/dependency /lds/lib/
 COPY --from=build /lds/target/linked-data-store-*.jar /lds/lib/
@@ -31,4 +32,4 @@ VOLUME ["/lds/conf", "/lds/schemas"]
 
 EXPOSE 9090
 
-CMD ["java", "-p", "/lds/lib", "-m", "no.ssb.lds.server/no.ssb.lds.server.Server"]
+CMD ["./run.sh"]

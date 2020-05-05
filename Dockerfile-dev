@@ -25,6 +25,7 @@ FROM alpine:latest as base
 #
 # Resources from build image
 #
+COPY run.sh /lds/run.sh
 COPY --from=build /linked /jdk/
 COPY target/dependency /lds/lib/
 COPY target/linked-data-store-*.jar /lds/lib/
@@ -37,7 +38,7 @@ VOLUME ["/lds/conf", "/lds/schemas"]
 
 EXPOSE 9090
 
-CMD ["java", "-p", "/lds/lib", "-m", "no.ssb.lds.server/no.ssb.lds.server.Server"]
+CMD ["./run.sh"]
 
 FROM statisticsnorway/raml-to-jsonschema:latest AS gsim-convert
 
@@ -62,6 +63,7 @@ FROM alpine:latest as gsim
 #
 # Resources from build image
 #
+COPY run.sh /lds/run.sh
 COPY --from=build /linked /jdk/
 COPY target/dependency /lds/lib/
 COPY target/linked-data-store-*.jar /lds/lib/
@@ -75,4 +77,4 @@ VOLUME ["/lds/conf", "/lds/schemas"]
 
 EXPOSE 9090
 
-CMD ["java", "-p", "/lds/lib", "-m", "no.ssb.lds.server/no.ssb.lds.server.Server"]
+CMD ["./run.sh"]
