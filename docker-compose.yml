@@ -23,7 +23,7 @@ services:
 
 
   db-neo4j:
-    image: neo4j:3.5
+    image: neo4j:4
     ports:
     - "7474:7474"
     - "7687:7687"
@@ -33,7 +33,7 @@ services:
     - NEO4J_AUTH=neo4j/PasSW0rd
 
   db-postgres:
-    image: postgres:11-alpine
+    image: postgres:12-alpine
     ports:
       - 5432:5432
     environment:

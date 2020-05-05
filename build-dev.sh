@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-for i in statisticsnorway/lds-browser-dev neo4j:3.5 postgres:11-alpine solr adminer; do
+for i in statisticsnorway/lds-browser-dev neo4j:4 postgres:12-alpine solr adminer; do
   docker pull $i &
 done
 
