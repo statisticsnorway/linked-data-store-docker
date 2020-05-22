@@ -12,6 +12,7 @@
 
     <logger name="no.ssb.lds" level="INFO"/>
     <logger name="no.ssb.lds.core.domain" level="INFO"/>
+    <logger name="no.ssb.lds.graphql.schemas" level="INFO"/>
 
     <root level="INFO">
         <appender-ref ref="STDOUT"/>
