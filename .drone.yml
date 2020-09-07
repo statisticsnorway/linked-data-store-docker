@@ -48,7 +48,7 @@ steps:
     image: plugins/gcr
     settings:
       target: base
-      dockerfile: Dockerfile-dev
+      dockerfile: Dockerfile
       repo: eu.gcr.io/prod-bip/ssb/lds-server
       registry: eu.gcr.io
       auto_tag: true
@@ -65,7 +65,7 @@ steps:
     image: plugins/gcr
     settings:
       target: gsim
-      dockerfile: Dockerfile-dev
+      dockerfile: Dockerfile
       repo: eu.gcr.io/prod-bip/ssb/lds-server
       registry: eu.gcr.io
       json_key:
@@ -83,7 +83,7 @@ steps:
     image: plugins/gcr
     settings:
       target: gsim
-      dockerfile: Dockerfile-dev
+      dockerfile: Dockerfile
       repo: eu.gcr.io/prod-bip/ssb/lds-server
       registry: eu.gcr.io
       build_args:
@@ -103,7 +103,7 @@ steps:
     image: plugins/gcr
     settings:
       target: gsim
-      dockerfile: Dockerfile-dev
+      dockerfile: Dockerfile
       repo: eu.gcr.io/prod-bip/ssb/lds-server-gsim
       registry: eu.gcr.io
       build_args:
