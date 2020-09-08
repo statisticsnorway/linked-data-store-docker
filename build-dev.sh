@@ -24,4 +24,4 @@ fi
 
 
 mvn clean verify dependency:copy-dependencies &&\
-docker build -t lds-server:dev --target base -f Dockerfile-dev .
+docker build -t lds-server:dev --target base -f Dockerfile .
