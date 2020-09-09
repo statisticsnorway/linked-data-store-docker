@@ -1,9 +1,6 @@
 name: (Build.SourceBranch)-$(date:yyyyMMdd)$(rev:.r)
 
 # Pipeline triggers on any branch and tag
-parameters:
-  - name:     'mavenContainer'
-    default:  'maven:3-jdk-11'
 trigger:
   branches:
     include:
@@ -56,7 +53,7 @@ jobs:
       imageName:              $(imageName)
       repoName:               $(repoName)
       artifactName:           lds-server
-      mavenContainer:         ${{ mavenContainer }}
+      mavenContainer:         'maven:3-jdk-11'
       checkStyleRunAnalysis:  false
 
   # Job which pulls the Docker image with the correct tag (image-scan-tag) from GCR, tags this
