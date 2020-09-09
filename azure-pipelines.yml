@@ -53,7 +53,6 @@ jobs:
       imageName:              $(imageName)
       repoName:               $(repoName)
       artifactName:           lds-server
-      checkStyleRunAnalysis:  false
 
   # Job which pulls the Docker image with the correct tag (image-scan-tag) from GCR, tags this
   # with the git tag, and pushes that back to GCR.
@@ -61,5 +60,5 @@ jobs:
   # the code repo are propagated to the corresponding (newly built) image in GCR.
   - template: docker/docker-tag-for-production.yml@templates
     parameters:
-      tagToTag:     ${{ variables.imageName }}
+      tagToTag:     lds-server
       gcrImageName: ${{ variables.imageName }}
