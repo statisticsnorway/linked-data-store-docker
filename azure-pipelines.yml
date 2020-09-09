@@ -53,7 +53,6 @@ jobs:
       imageName:              $(imageName)
       repoName:               $(repoName)
       artifactName:           lds-server
-      mavenContainer:         'maven:3-jdk-11'
       checkStyleRunAnalysis:  false
 
   # Job which pulls the Docker image with the correct tag (image-scan-tag) from GCR, tags this
