@@ -125,10 +125,10 @@ jobs:
           fi
 
           #Copying the neo4j plugin dependency
-          files=$(shopt -s nullglob dotglob; echo $(Pipeline.Workspace)/${{ parameters.artifactName }}/dependency/*)
+          files=$(shopt -s nullglob dotglob; echo $(Pipeline.Workspace)/${{ parameters.artifactName }}/neo4jplugins/*)
           if (( ${#files} ))
           then
-              cp $(Pipeline.Workspace)/${{ parameters.artifactName }}/dependency/* ./target/dependency
+              cp $(Pipeline.Workspace)/${{ parameters.artifactName }}/neo4jplugins/* ./target/dependency
               echo "Found and copied dependencies"
           else
               echo "No dependencies found"
