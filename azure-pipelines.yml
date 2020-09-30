@@ -40,11 +40,11 @@ variables:
     value:  'eu.gcr.io/prod-bip/ssb/lds-server'
   - name:   repoName
     value:  'prod-bip/ssb/lds-server'
-  - name:   artifactName
+  - name:   'artifactName'
     value:  'lds-server'
-  - name:   mavenContainer
+  - name:   'mavenContainer'
     value:  'maven:3-jdk-11'
-  - name:   checkStyleRunAnalysis
+  - name:   'checkStyleRunAnalysis'
     value:  'true'
   - name:   MAVEN_CACHE_FOLDER
     value:  $(Pipeline.Workspace)/.m2/repository
