@@ -30,29 +30,116 @@ variables:
   - group: Hemmeligheter
 
   # Variables defined here
-  - name:   fullSha
-    value:  '$(Build.SourceVersion)'
-  - name:   imageHost
-    value:  'https://eu.gcr.io/'
-  - name:   imageName
-    value:  'eu.gcr.io/prod-bip/ssb/lds-server'
-  - name:   repoName
-    value:  'prod-bip/ssb/lds-server'
-  - name:   MAVEN_CACHE_FOLDER
-    value:  $(Pipeline.Workspace)/.m2/repository
-  - name:   MAVEN_OPTS
-    value:  '-Dmaven.repo.local=$(MAVEN_CACHE_FOLDER)'
+  - name:     fullSha
+    value:    '$(Build.SourceVersion)'
+  - name:     project
+    value:    'lds'
+  - name:     imageHost
+    value:    'https://eu.gcr.io/'
+  - name:     imageName
+    value:    'eu.gcr.io/prod-bip/ssb/lds-server'
+  - name:     repoName
+    value:    'prod-bip/ssb/lds-server'
+  - name:     artifactName
+    value:    'lds-server'
+  - name:     mavenContainer
+    default:  'maven:3-jdk-11'
+  - name:     checkStyleRunAnalysis
+    default:  'true'
+  - name:     MAVEN_CACHE_FOLDER
+    value:    $(Pipeline.Workspace)/.m2/repository
+  - name:     MAVEN_OPTS
+    value:    '-Dmaven.repo.local=$(MAVEN_CACHE_FOLDER)'
 
 
 # Job which runs mvn test and verify, Sonar Analysis (if branch is master), mvn install,
 # builds Docker image, pushes this to GCR and checks for any image vulnerabilities
 jobs:
-  - template: complete-builds/job-test-coverage-build-gcr.yml@templates
-    parameters:
-      project:      lds
-      imageName:    $(imageName)
-      repoName:     $(repoName)
-      artifactName: lds-server
+  - job: buildTestPublishToPipeline
+      displayName: 'Test/build app and Dockerimage'
+      container: ${{ parameters.mavenContainer }}
+      # Job condition: Run these jobs on any branch, but not on tags
+      condition: not(startsWith(variables['Build.SourceBranch'], 'refs/tags/'))
+      # Steps in this Job
+      steps:
+        # Authenticate Maven to Nexus using predefined Service Connections
+        # (Project Settings->Pipelines->Service Connections)
+        - template: ${{variables['System.DefaultWorkingDirectory']}}/maven/task-maven-complete.yml
+          parameters:
+            checkStyleRunAnalysis: ${{ parameters.checkStyleRunAnalysis }}
+
+        # Publish pipeline artifact
+        - publish: target
+          displayName: 'Publish artifact to pipeline'
+          artifact: ${{ parameters.artifactName }}
+
+        - job: dockerBuildAndDockerPush
+          dependsOn: buildTestPublishToPipeline
+          steps:
+            # Download pipleline artifact
+            - download: current
+              displayName: 'Download pipeline artifact'
+              artifact: ${{ parameters.artifactName }}
+
+            # Copy pipeline artifact into working directory
+            - bash: |
+                mkdir target
+                mkdir target/libs
+                mkdir target/classes
+                mkdir target/dependency
+
+                files=$(shopt -s nullglob dotglob; echo $(Pipeline.Workspace)/${{ parameters.artifactName }}/*.jar)
+                if (( ${#files} ))
+                then
+                    cp $(Pipeline.Workspace)/${{ parameters.artifactName }}/*.jar ./target
+                    echo "Found and copied.jar files"
+                else
+                    echo "No .jar files found"
+                fi
+
+                files=$(shopt -s nullglob dotglob; echo $(Pipeline.Workspace)/${{ parameters.artifactName }}/libs/*)
+                if (( ${#files} ))
+                then
+                    cp $(Pipeline.Workspace)/${{ parameters.artifactName }}/libs/* ./target/libs
+                    echo "Found and copied files in /libs"
+                else
+                    echo "No files found in /libs"
+                fi
+
+                files=$(shopt -s nullglob dotglob; echo $(Pipeline.Workspace)/${{ parameters.artifactName }}/classes/*.xml)
+                if (( ${#files} ))
+                then
+                    cp $(Pipeline.Workspace)/${{ parameters.artifactName }}/classes/*.xml ./target/classes
+                    echo "Found and copied .xml files in /classes/"
+                else
+                    echo "No .xml files found in /classes/"
+                fi
+
+                files=$(shopt -s nullglob dotglob; echo $(Pipeline.Workspace)/${{ parameters.artifactName }}/classes/*.yaml)
+                if (( ${#files} ))
+                then
+                    cp $(Pipeline.Workspace)/${{ parameters.artifactName }}/classes/*.yaml ./target/classes
+                    echo "Found and copied .yaml files in /classes/"
+                else
+                    echo "No .yaml files found in /classes/"
+                fi
+
+                #Copying the neo4j plugin dependency
+                files=$(shopt -s nullglob dotglob; echo $(Pipeline.Workspace)/${{ parameters.artifactName }}/dependency/*)
+                if (( ${#files} ))
+                then
+                    cp $(Pipeline.Workspace)/${{ parameters.artifactName }}/dependency/* ./target/dependency
+                    echo "Found and copied dependencies"
+                else
+                    echo "No dependencies found"
+                fi
+              displayName: 'Copy pipeline artifact into working directory'
+
+            - template: ${{variables['System.DefaultWorkingDirectory']}}/docker/docker-build-image-and-push-to-gcr.yml
+              parameters:
+                project: ${{ parameters.project }}
+                imageName: ${{ parameters.imageName }}
+                repoName: ${{ parameters.repoName }}
 
   # Job which pulls the Docker image with the correct tag (image-scan-tag) from GCR, tags this
   # with the git tag, and pushes that back to GCR.
