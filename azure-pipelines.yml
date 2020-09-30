@@ -135,11 +135,11 @@ jobs:
           fi
         displayName: 'Copy pipeline artifact into working directory'
 
-          - template: ${{variables['System.DefaultWorkingDirectory']}}/docker/docker-build-image-and-push-to-gcr.yml
-            parameters:
-              project: ${{ parameters.project }}
-              imageName: ${{ parameters.imageName }}
-              repoName: ${{ parameters.repoName }}
+      - template: ${{variables['System.DefaultWorkingDirectory']}}/docker/docker-build-image-and-push-to-gcr.yml
+        parameters:
+          project: ${{ parameters.project }}
+          imageName: ${{ parameters.imageName }}
+          repoName: ${{ parameters.repoName }}
 
   # Job which pulls the Docker image with the correct tag (image-scan-tag) from GCR, tags this
   # with the git tag, and pushes that back to GCR.
