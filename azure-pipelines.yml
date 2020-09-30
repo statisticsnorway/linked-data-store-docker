@@ -55,11 +55,11 @@ variables:
 # Job which runs mvn test and verify, Sonar Analysis (if branch is master), mvn install,
 # builds Docker image, pushes this to GCR and checks for any image vulnerabilities
 jobs:
-  - job: buildTestPublishToPipeline
-      displayName: 'Test/build app and Dockerimage'
-      container: ${{ parameters.mavenContainer }}
+  - job:  buildTestPublishToPipeline
+      displayName:  'Test/build app and Dockerimage'
+      container:  ${{ parameters.mavenContainer }}
       # Job condition: Run these jobs on any branch, but not on tags
-      condition: not(startsWith(variables['Build.SourceBranch'], 'refs/tags/'))
+      condition:  not(startsWith(variables['Build.SourceBranch'], 'refs/tags/'))
       # Steps in this Job
       steps:
         # Authenticate Maven to Nexus using predefined Service Connections
