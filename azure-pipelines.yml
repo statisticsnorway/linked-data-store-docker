@@ -57,7 +57,7 @@ variables:
 jobs:
   - job:  buildTestPublishToPipeline
     displayName:  'Test/build app and Dockerimage'
-    container:  ${{ parameters.mavenContainer }}
+    container:  ${{ variables.mavenContainer }}
     # Job condition: Run these jobs on any branch, but not on tags
     condition:  not(startsWith(variables['Build.SourceBranch'], 'refs/tags/'))
     # Steps in this Job
@@ -66,12 +66,12 @@ jobs:
       # (Project Settings->Pipelines->Service Connections)
       - template: ${{variables['System.DefaultWorkingDirectory']}}/maven/task-maven-complete.yml
         parameters:
-          checkStyleRunAnalysis: ${{ parameters.checkStyleRunAnalysis }}
+          checkStyleRunAnalysis: ${{ variables.checkStyleRunAnalysis }}
 
       # Publish pipeline artifact
       - publish: target
         displayName: 'Publish artifact to pipeline'
-        artifact: ${{ parameters.artifactName }}
+        artifact: ${{ variables.artifactName }}
 
   - job: dockerBuildAndDockerPush
     dependsOn: buildTestPublishToPipeline
@@ -79,7 +79,7 @@ jobs:
       # Download pipleline artifact
       - download: current
         displayName: 'Download pipeline artifact'
-        artifact: ${{ parameters.artifactName }}
+        artifact: ${{ variables.artifactName }}
 
       # Copy pipeline artifact into working directory
       - bash: |
@@ -137,9 +137,9 @@ jobs:
 
       - template: ${{variables['System.DefaultWorkingDirectory']}}/docker/docker-build-image-and-push-to-gcr.yml
         parameters:
-          project: ${{ parameters.project }}
-          imageName: ${{ parameters.imageName }}
-          repoName: ${{ parameters.repoName }}
+          project: ${{ variables.project }}
+          imageName: ${{ variables.imageName }}
+          repoName: ${{ variables.repoName }}
 
   # Job which pulls the Docker image with the correct tag (image-scan-tag) from GCR, tags this
   # with the git tag, and pushes that back to GCR.
