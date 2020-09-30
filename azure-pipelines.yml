@@ -64,7 +64,7 @@ jobs:
     steps:
       # Authenticate Maven to Nexus using predefined Service Connections
       # (Project Settings->Pipelines->Service Connections)
-      - template: ${{variables['System.DefaultWorkingDirectory']}}/maven/task-maven-complete.yml
+      - template: maven/task-maven-complete.yml@templates
         parameters:
           checkStyleRunAnalysis: ${{ variables.checkStyleRunAnalysis }}
 
@@ -88,54 +88,54 @@ jobs:
           mkdir target/classes
           mkdir target/dependency
 
-          files=$(shopt -s nullglob dotglob; echo $(Pipeline.Workspace)/${{ parameters.artifactName }}/*.jar)
+          files=$(shopt -s nullglob dotglob; echo $(Pipeline.Workspace)/${{ variables.artifactName }}/*.jar)
           if (( ${#files} ))
           then
-              cp $(Pipeline.Workspace)/${{ parameters.artifactName }}/*.jar ./target
+              cp $(Pipeline.Workspace)/${{ variables.artifactName }}/*.jar ./target
               echo "Found and copied.jar files"
           else
               echo "No .jar files found"
           fi
 
-          files=$(shopt -s nullglob dotglob; echo $(Pipeline.Workspace)/${{ parameters.artifactName }}/libs/*)
+          files=$(shopt -s nullglob dotglob; echo $(Pipeline.Workspace)/${{ variables.artifactName }}/libs/*)
           if (( ${#files} ))
           then
-              cp $(Pipeline.Workspace)/${{ parameters.artifactName }}/libs/* ./target/libs
+              cp $(Pipeline.Workspace)/${{ variables.artifactName }}/libs/* ./target/libs
               echo "Found and copied files in /libs"
           else
               echo "No files found in /libs"
           fi
 
-          files=$(shopt -s nullglob dotglob; echo $(Pipeline.Workspace)/${{ parameters.artifactName }}/classes/*.xml)
+          files=$(shopt -s nullglob dotglob; echo $(Pipeline.Workspace)/${{ variables.artifactName }}/classes/*.xml)
           if (( ${#files} ))
           then
-              cp $(Pipeline.Workspace)/${{ parameters.artifactName }}/classes/*.xml ./target/classes
+              cp $(Pipeline.Workspace)/${{ variables.artifactName }}/classes/*.xml ./target/classes
               echo "Found and copied .xml files in /classes/"
           else
               echo "No .xml files found in /classes/"
           fi
 
-          files=$(shopt -s nullglob dotglob; echo $(Pipeline.Workspace)/${{ parameters.artifactName }}/classes/*.yaml)
+          files=$(shopt -s nullglob dotglob; echo $(Pipeline.Workspace)/${{ variables.artifactName }}/classes/*.yaml)
           if (( ${#files} ))
           then
-              cp $(Pipeline.Workspace)/${{ parameters.artifactName }}/classes/*.yaml ./target/classes
+              cp $(Pipeline.Workspace)/${{ variables.artifactName }}/classes/*.yaml ./target/classes
               echo "Found and copied .yaml files in /classes/"
           else
               echo "No .yaml files found in /classes/"
           fi
 
           #Copying the neo4j plugin dependency
-          files=$(shopt -s nullglob dotglob; echo $(Pipeline.Workspace)/${{ parameters.artifactName }}/neo4jplugins/*)
+          files=$(shopt -s nullglob dotglob; echo $(Pipeline.Workspace)/${{ variables.artifactName }}/neo4jplugins/*)
           if (( ${#files} ))
           then
-              cp $(Pipeline.Workspace)/${{ parameters.artifactName }}/neo4jplugins/* ./target/dependency
+              cp $(Pipeline.Workspace)/${{ variables.artifactName }}/neo4jplugins/* ./target/dependency
               echo "Found and copied dependencies"
           else
               echo "No dependencies found"
           fi
         displayName: 'Copy pipeline artifact into working directory'
 
-      - template: ${{variables['System.DefaultWorkingDirectory']}}/docker/docker-build-image-and-push-to-gcr.yml
+      - template: docker/docker-build-image-and-push-to-gcr.yml@templates
         parameters:
           project: ${{ variables.project }}
           imageName: ${{ variables.imageName }}
