@@ -30,26 +30,26 @@ variables:
   - group: Hemmeligheter
 
   # Variables defined here
-  - name:     fullSha
-    value:    '$(Build.SourceVersion)'
-  - name:     project
-    value:    'lds'
-  - name:     imageHost
-    value:    'https://eu.gcr.io/'
-  - name:     imageName
-    value:    'eu.gcr.io/prod-bip/ssb/lds-server'
-  - name:     repoName
-    value:    'prod-bip/ssb/lds-server'
-  - name:     artifactName
-    value:    'lds-server'
-  - name:     mavenContainer
-    default:  'maven:3-jdk-11'
-  - name:     checkStyleRunAnalysis
-    default:  'true'
-  - name:     MAVEN_CACHE_FOLDER
-    value:    $(Pipeline.Workspace)/.m2/repository
-  - name:     MAVEN_OPTS
-    value:    '-Dmaven.repo.local=$(MAVEN_CACHE_FOLDER)'
+  - name:   fullSha
+    value:  '$(Build.SourceVersion)'
+  - name:   project
+    value:  'lds'
+  - name:   imageHost
+    value:  'https://eu.gcr.io/'
+  - name:   imageName
+    value:  'eu.gcr.io/prod-bip/ssb/lds-server'
+  - name:   repoName
+    value:  'prod-bip/ssb/lds-server'
+  - name:   artifactName
+    value:  'lds-server'
+  - name:   mavenContainer
+    value:  'maven:3-jdk-11'
+  - name:   checkStyleRunAnalysis
+    value:  'true'
+  - name:   MAVEN_CACHE_FOLDER
+    value:  $(Pipeline.Workspace)/.m2/repository
+  - name:   MAVEN_OPTS
+    value:  '-Dmaven.repo.local=$(MAVEN_CACHE_FOLDER)'
 
 
 # Job which runs mvn test and verify, Sonar Analysis (if branch is master), mvn install,
