@@ -66,17 +66,17 @@ jobs:
     steps:
       # Authenticate Maven to Nexus using predefined Service Connections
       # (Project Settings->Pipelines->Service Connections)
-      - template: ${{variables['System.DefaultWorkingDirectory']}}/maven/task-authenticate.yml
+      - template: maven/task-authenticate.yml@template
         parameters:
           connections: ${{ variables.connections }}
 
-      - template: ${{variables['System.DefaultWorkingDirectory']}}/maven/task-cache.yml
+      - template: maven/task-cache.yml@template
 
-      - template: ${{variables['System.DefaultWorkingDirectory']}}/maven/task-test-and-verify.yml
+      - template: maven/task-test-and-verify.yml@template
         parameters:
           checkStyleRunAnalysis: ${{ variables.checkStyleRunAnalysis }}
 
-      - template: ${{variables['System.DefaultWorkingDirectory']}}/maven/task-sonar-analyze.yml
+      - template: maven/task-sonar-analyze.yml@template
 
       # Deploy artifact to Nexus
       - task: Maven@3
