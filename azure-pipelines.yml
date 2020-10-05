@@ -88,8 +88,6 @@ jobs:
           mkdir target/classes
           mkdir target/dependency
 
-          mvn clean verify dependency:copy-dependencies
-
           files=$(shopt -s nullglob dotglob; echo $(Pipeline.Workspace)/${{ variables.artifactName }}/*.jar)
           if (( ${#files} ))
           then
