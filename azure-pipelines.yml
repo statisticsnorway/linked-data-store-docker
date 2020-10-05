@@ -129,9 +129,10 @@ jobs:
           if (( ${#files} ))
           then
               cp $(Pipeline.Workspace)/${{ variables.artifactName }}/dependency/* ./target/dependency
-              echo "Found and copied dependencies"
+              echo "Found and copied dependencies to /dependency"
           else
-              echo "No dependencies found"
+              echo "No dependencies found in /dependency"
+              ls
           fi
         displayName: 'Copy pipeline artifact into working directory'
 
