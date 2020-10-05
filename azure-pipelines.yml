@@ -50,6 +50,8 @@ variables:
     value: $(Pipeline.Workspace)/.m2/repository
   - name: MAVEN_OPTS
     value: '-Dmaven.repo.local=$(MAVEN_CACHE_FOLDER)'
+  - name: 'connections'
+    value: 'mvnSsbBipPublic, mvnSsbBipReleases, mvnSsbBipSnapshots'
 
 
 # Job which runs mvn test and verify, Sonar Analysis (if branch is master), mvn install,
@@ -64,9 +66,29 @@ jobs:
     steps:
       # Authenticate Maven to Nexus using predefined Service Connections
       # (Project Settings->Pipelines->Service Connections)
-      - template: maven/task-maven-complete.yml@templates
+      - template: ${{variables['System.DefaultWorkingDirectory']}}/maven/task-authenticate.yml
+        parameters:
+          connections: ${{ variables.connections }}
+
+      - template: ${{variables['System.DefaultWorkingDirectory']}}/maven/task-cache.yml
+
+      - template: ${{variables['System.DefaultWorkingDirectory']}}/maven/task-test-and-verify.yml
         parameters:
           checkStyleRunAnalysis: ${{ variables.checkStyleRunAnalysis }}
+
+      - template: ${{variables['System.DefaultWorkingDirectory']}}/maven/task-sonar-analyze.yml
+
+      # Deploy artifact to Nexus
+      - task: Maven@3
+        displayName: 'Maven install and deploy'
+        inputs:
+          mavenPomFile: 'pom.xml'
+          mavenOptions: '-Xmx3072m'
+          jdkArchitectureOption: 'x64'
+          publishJUnitResults: false
+          testResultsFiles: '**/TEST-*.xml'
+          goals: 'deploy'
+          options: 'clean verify dependency:copy-dependencies -DskipTests=true -Dmaven.javadoc.skip=true -U -P ssb-bip --batch-mode -Djdk.tls.client.protocols="TLSv1.2" $(MAVEN_OPTS)'
 
       # Publish pipeline artifact
       - publish: target
