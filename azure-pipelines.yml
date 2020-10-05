@@ -124,11 +124,11 @@ jobs:
               echo "No .yaml files found in /classes/"
           fi
 
-          #Copying the neo4j plugin dependency
-          files=$(shopt -s nullglob dotglob; echo $(Pipeline.Workspace)/${{ variables.artifactName }}/neo4jplugins/*)
+          #Copying dependencies
+          files=$(shopt -s nullglob dotglob; echo $(Pipeline.Workspace)/${{ variables.artifactName }}/dependency/*)
           if (( ${#files} ))
           then
-              cp $(Pipeline.Workspace)/${{ variables.artifactName }}/neo4jplugins/* ./target/dependency
+              cp $(Pipeline.Workspace)/${{ variables.artifactName }}/dependency/* ./target/dependency
               echo "Found and copied dependencies"
           else
               echo "No dependencies found"
