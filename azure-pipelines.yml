@@ -88,6 +88,8 @@ jobs:
           mkdir target/classes
           mkdir target/dependency
 
+          mvn clean verify dependency:copy-dependencies
+
           files=$(shopt -s nullglob dotglob; echo $(Pipeline.Workspace)/${{ variables.artifactName }}/*.jar)
           if (( ${#files} ))
           then
@@ -132,8 +134,6 @@ jobs:
               echo "Found and copied dependencies to /dependency"
           else
               echo "No dependencies found in /dependency"
-              cd target
-              ls
           fi
         displayName: 'Copy pipeline artifact into working directory'
 
