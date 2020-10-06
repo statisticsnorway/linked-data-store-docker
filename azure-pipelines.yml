@@ -108,6 +108,7 @@ jobs:
           mkdir target
           mkdir target/libs
           mkdir target/classes
+          mkdir target/dependency
 
           files=$(shopt -s nullglob dotglob; echo $(Pipeline.Workspace)/${{ variables.artifactName }}/*.jar)
           if (( ${#files} ))
