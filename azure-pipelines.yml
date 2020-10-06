@@ -108,7 +108,6 @@ jobs:
           mkdir target
           mkdir target/libs
           mkdir target/classes
-          mkdir target/dependency
 
           files=$(shopt -s nullglob dotglob; echo $(Pipeline.Workspace)/${{ variables.artifactName }}/*.jar)
           if (( ${#files} ))
@@ -144,16 +143,6 @@ jobs:
               echo "Found and copied .yaml files in /classes/"
           else
               echo "No .yaml files found in /classes/"
-          fi
-
-          #Copying dependencies
-          files=$(shopt -s nullglob dotglob; echo $(Pipeline.Workspace)/${{ variables.artifactName }}/dependency/*)
-          if (( ${#files} ))
-          then
-              cp $(Pipeline.Workspace)/${{ variables.artifactName }}/dependency/* ./target/dependency
-              echo "Found and copied dependencies to /dependency"
-          else
-              echo "No dependencies found in /dependency"
           fi
         displayName: 'Copy pipeline artifact into working directory'
 
