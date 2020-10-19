@@ -1,19 +1,163 @@
-# Starter pipeline
-# Start with a minimal pipeline that you can customize to build and deploy your code.
-# Add steps that build, run tests, deploy, and more:
-# https://aka.ms/yaml
+name: (Build.SourceBranch)-$(date:yyyyMMdd)$(rev:.r)
 
+# Pipeline triggers on any branch and tag
 trigger:
-- master
+  branches:
+    include:
+      - '*'
+  tags:
+    include:
+      - '*'
 
+resources:
+  repositories:
+    - repository: templates
+      type:       github
+      name:       statisticsnorway/azure-pipelines-templates
+      ref:        refs/tags/0.1.4
+      endpoint:   statisticsnorway (6)
+
+# Pipeline will be run on this base image
 pool:
   vmImage: 'ubuntu-latest'
 
-steps:
-- script: echo Hello, world!
-  displayName: 'Run a one-line script'
+# Variables global to this pipeline
+# https://docs.microsoft.com/en-us/azure/devops/pipelines/process/variables
+variables:
 
-- script: |
-    echo Add other tasks to build, test, and deploy your project.
-    echo See https://aka.ms/yaml
-  displayName: 'Run a multi-line script'
+  # Variables defined in Pipelines->Library->Variable Groups in your project in
+  # Azure Pipelines
+  - group: Hemmeligheter
+
+  # Variables defined here
+  - name: fullSha
+    value: '$(Build.SourceVersion)'
+  - name: project
+    value: 'lds'
+  - name: imageHost
+    value: 'https://eu.gcr.io/'
+  - name: imageName
+    value: 'eu.gcr.io/prod-bip/ssb/lds-server'
+  - name: repoName
+    value: 'prod-bip/ssb/lds-server'
+  - name: artifactName
+    value: 'lds-server'
+  - name: mavenContainer
+    value: 'maven:3-jdk-11'
+  - name: checkStyleRunAnalysis
+    value: 'true'
+  - name: MAVEN_CACHE_FOLDER
+    value: $(Pipeline.Workspace)/.m2/repository
+  - name: MAVEN_OPTS
+    value: '-Dmaven.repo.local=$(MAVEN_CACHE_FOLDER)'
+  - name: 'connections'
+    value: 'mvnSsbBipPublic, mvnSsbBipReleases, mvnSsbBipSnapshots'
+
+
+# Job which runs mvn test and verify, Sonar Analysis (if branch is master), mvn install,
+# builds Docker image, pushes this to GCR and checks for any image vulnerabilities
+jobs:
+  - job:  buildTestPublishToPipeline
+    displayName:  'Test/build app and Dockerimage'
+    container:  ${{ variables.mavenContainer }}
+    # Job condition: Run these jobs on any branch, but not on tags
+    condition:  not(startsWith(variables['Build.SourceBranch'], 'refs/tags/'))
+    # Steps in this Job
+    steps:
+      # Authenticate Maven to Nexus using predefined Service Connections
+      # (Project Settings->Pipelines->Service Connections)
+      - template: maven/task-authenticate.yml@templates
+        parameters:
+          connections: ${{ variables.connections }}
+
+      - template: maven/task-cache.yml@templates
+
+      - template: maven/task-test-and-verify.yml@templates
+        parameters:
+          checkStyleRunAnalysis: ${{ variables.checkStyleRunAnalysis }}
+
+      - template: maven/task-sonar-analyze.yml@templates
+
+      # Deploy artifact to Nexus
+      - task: Maven@3
+        displayName: 'Maven install and deploy'
+        inputs:
+          mavenPomFile: 'pom.xml'
+          mavenOptions: '-Xmx3072m'
+          jdkArchitectureOption: 'x64'
+          publishJUnitResults: false
+          testResultsFiles: '**/TEST-*.xml'
+          goals: 'deploy'
+          options: 'clean verify dependency:copy-dependencies -DskipTests=true -Dmaven.javadoc.skip=true -U -P ssb-bip --batch-mode -Djdk.tls.client.protocols="TLSv1.2" $(MAVEN_OPTS)'
+
+      # Publish pipeline artifact
+      - publish: target
+        displayName: 'Publish artifact to pipeline'
+        artifact: ${{ variables.artifactName }}
+
+  - job: dockerBuildAndDockerPush
+    dependsOn: buildTestPublishToPipeline
+    steps:
+      # Download pipleline artifact
+      - download: current
+        displayName: 'Download pipeline artifact'
+        artifact: ${{ variables.artifactName }}
+
+      # Copy pipeline artifact into working directory
+      - bash: |
+          mkdir target
+          mkdir target/libs
+          mkdir target/classes
+          mkdir target/dependency
+
+          files=$(shopt -s nullglob dotglob; echo $(Pipeline.Workspace)/${{ variables.artifactName }}/*.jar)
+          if (( ${#files} ))
+          then
+              cp $(Pipeline.Workspace)/${{ variables.artifactName }}/*.jar ./target
+              echo "Found and copied.jar files"
+          else
+              echo "No .jar files found"
+          fi
+
+          files=$(shopt -s nullglob dotglob; echo $(Pipeline.Workspace)/${{ variables.artifactName }}/libs/*)
+          if (( ${#files} ))
+          then
+              cp $(Pipeline.Workspace)/${{ variables.artifactName }}/libs/* ./target/libs
+              echo "Found and copied files in /libs"
+          else
+              echo "No files found in /libs"
+          fi
+
+          files=$(shopt -s nullglob dotglob; echo $(Pipeline.Workspace)/${{ variables.artifactName }}/classes/*.xml)
+          if (( ${#files} ))
+          then
+              cp $(Pipeline.Workspace)/${{ variables.artifactName }}/classes/*.xml ./target/classes
+              echo "Found and copied .xml files in /classes/"
+          else
+              echo "No .xml files found in /classes/"
+          fi
+
+          files=$(shopt -s nullglob dotglob; echo $(Pipeline.Workspace)/${{ variables.artifactName }}/classes/*.yaml)
+          if (( ${#files} ))
+          then
+              cp $(Pipeline.Workspace)/${{ variables.artifactName }}/classes/*.yaml ./target/classes
+              echo "Found and copied .yaml files in /classes/"
+          else
+              echo "No .yaml files found in /classes/"
+          fi
+        displayName: 'Copy pipeline artifact into working directory'
+
+      - template: docker/docker-build-image-and-push-to-gcr.yml@templates
+        parameters:
+          project: ${{ variables.project }}
+          imageName: ${{ variables.imageName }}
+          repoName: ${{ variables.repoName }}
+
+  # Job which pulls the Docker image with the correct tag (image-scan-tag) from GCR, tags this
+  # with the git tag, and pushes that back to GCR.
+  # The job triggers when any tag was committed to GitHub, which means all tags in
+  # the code repo are propagated to the corresponding (newly built) image in GCR.
+  - template: docker/docker-tag-for-production.yml@templates
+    parameters:
+      tagToTag:     'master-$(fullSha)'
+      gcrImageName: ${{ variables.imageName }}
