@@ -105,27 +105,26 @@ jobs:
 
       # Copy pipeline artifact into working directory
       - bash: |
-          mkdir target
-          mkdir target/libs
-          mkdir target/classes
-          mkdir target/dependency
+          mkdir -p target
+          mkdir -p target/classes
+          mkdir -p target/dependency
 
           files=$(shopt -s nullglob dotglob; echo $(Pipeline.Workspace)/${{ variables.artifactName }}/*.jar)
           if (( ${#files} ))
           then
               cp $(Pipeline.Workspace)/${{ variables.artifactName }}/*.jar ./target
-              echo "Found and copied.jar files"
+              echo "Found and copied .jar files"
           else
               echo "No .jar files found"
           fi
 
-          files=$(shopt -s nullglob dotglob; echo $(Pipeline.Workspace)/${{ variables.artifactName }}/libs/*)
+          files=$(shopt -s nullglob dotglob; echo $(Pipeline.Workspace)/${{ variables.artifactName }}/dependency/*)
           if (( ${#files} ))
           then
-              cp $(Pipeline.Workspace)/${{ variables.artifactName }}/libs/* ./target/libs
-              echo "Found and copied files in /libs"
+              cp $(Pipeline.Workspace)/${{ variables.artifactName }}/dependency/* ./target/dependency
+              echo "Found and copied files in /dependency"
           else
-              echo "No files found in /libs"
+              echo "No files found in /dependency"
           fi
 
           files=$(shopt -s nullglob dotglob; echo $(Pipeline.Workspace)/${{ variables.artifactName }}/classes/*.xml)
