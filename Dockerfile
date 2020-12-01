@@ -29,7 +29,7 @@ RUN apk --no-cache add curl tar gzip nano jq
 #
 COPY run.sh /lds/run.sh
 COPY --from=build /linked /jdk/
-COPY --from=build /jdk/bin/jar /jdk/bin/jcmd /jdk/bin/jdb /jdk/bin/jfr /jdk/bin/jinfo /jdk/bin/jmap /jdk/bin/jps /jdk/bin/jstack /jdk/bin/jstat /linked/bin/
+COPY --from=build /jdk/bin/jar /jdk/bin/jcmd /jdk/bin/jdb /jdk/bin/jfr /jdk/bin/jinfo /jdk/bin/jmap /jdk/bin/jps /jdk/bin/jstack /jdk/bin/jstat /jdk/bin/
 COPY target/dependency /lds/lib/
 COPY target/linked-data-store-*.jar /lds/lib/
 
